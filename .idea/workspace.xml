@@ -11,15 +11,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="904e4175-f23a-4f28-9a17-9a567569c65a" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/functions.c" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/functions.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/structs.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/a.out" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.c" beforeDir="false" afterPath="$PROJECT_DIR$/main.c" afterDir="false" />
-    </list>
+    <list default="true" id="904e4175-f23a-4f28-9a17-9a567569c65a" name="Default" comment="" />
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -162,12 +154,12 @@
       <workItem from="1541336024404" duration="6200000" />
       <workItem from="1541344811231" duration="950000" />
       <workItem from="1541348054661" duration="8623000" />
-      <workItem from="1541369749093" duration="2048000" />
+      <workItem from="1541369749093" duration="2650000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="47372000" />
+    <option name="totallyTimeSpent" value="47974000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
