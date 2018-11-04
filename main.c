@@ -2,110 +2,397 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include "structs.h"
+#include "functions.h"
 
-    typedef struct tuple
+#define n 2
+
+
+int main(int argc,char **argv)
     {
-        unsigned key;
-        unsigned payload;
-    }tuple;
-
-    typedef struct hist
-    {
-        unsigned binary;
-        unsigned count;
-    }hist;
-
-
-    int main(int argc,char **argv)
-    {
-        int n=2; ////2^n
         time_t t;
         srand((unsigned) time(&t));
 
+        int power=pow(2,n);
+        int mask=power-1;
 
-        tuple *array=malloc(sizeof(struct tuple)*10);
+        //////////////////////////////////////////////////
+        /////////FIRST HASHING
+        tuple *array_R=malloc(sizeof(struct tuple)*10);
         for(int i=0; i<10; i++)
         {
-            array[i].key=i+1;
-            array[i].payload=rand()%10;
+            array_R[i].check=0;
+            array_R[i].key=i;
+            array_R[i].payload=rand()%10;
+        }
+
+        printf("\nARRAY R\n");
+        for(int i=0; i<10; i++)
+        {
+            printf("id %d:\t%d\n",array_R[i].key,array_R[i].payload);
+        }
+
+        ///////////////////////////////////////////////////////
+
+
+        ////////////////////////////////////////////////////////
+        ////////HIST
+        hist * Hist_array_R=malloc(sizeof(hist)* pow(2,n));
+
+        for(int i=0; i<power; i++)
+        {
+            Hist_array_R[i].binary=i;
+            Hist_array_R[i].count=0;
         }
 
         for(int i=0; i<10; i++)
         {
-            printf("id %d:\t%d\n",array[i].key,array[i].payload);
-        }
-
-
-        hist * hist_array=malloc(sizeof(hist)* pow(2,n));
-
-        for(int i=0; i<pow(2,n); i++)
-        {
-            hist_array[i].binary=i;
-            hist_array[i].count=0;
-        }
-
-
-        for(int i=0; i<10; i++)
-        {
-            for(int j=0; j<pow(2,n); j++)
+            for(int j=0; j<power; j++)
             {
-                //printf("%d  kai %d \n",array[i].payload & 0x2,hist_array[j].binary);
-                if( (array[i].payload & 0x3)==hist_array[j].binary)
+                if( (array_R[i].payload & mask)==Hist_array_R[j].binary)
                 {
-                    //  printf("mphka\n");
-                    hist_array[j].count++;
+                    Hist_array_R[j].count++;
+                    break;
                 }
             }
         }
-
-        for(int i=0; i < pow(2,n); i++)
+        printf("\nHIST R\n");
+        for(int i=0; i < power; i++)
         {
-            //printf("id %d: \t %d\n",hist_array[i].binary,hist_array[i].count);
+            printf("id %d: \t %d\n",Hist_array_R[i].binary,Hist_array_R[i].count);
         }
 
+        ///////////////////////////////////////////////////////////////////////////
 
-        hist * psum=malloc(sizeof(hist)*pow(2,n));
-        psum[0].binary=0;
-        psum[0].count=0;
-        for(int i=1; i<pow(2,n); i++)
-        {
-            psum[i].binary=i;
-            int k=i-1;
-            psum[i].count=psum[k].count+hist_array[k].count;
-        }
 
-        for (int i = 0; i <pow(2,n) ; i++)
-        {
-            printf("id %d: \t %d\n",psum[i].binary,psum[i].count);
-
-        }
-
-        tuple *final_array=malloc(sizeof(struct tuple)*10);
-
-        int where=0;
-        while(where <= pow(2,n))
+        ////////////////////////////////////////////////////////////////////
+        //////////////PSUM
+        hist * Psum_R=malloc(sizeof(hist)*(power));
+        for(int i=0; i<power; i++)
         {
 
-            for(int i=psum[where].count; i<psum[where+1].count; i++)
+            Psum_R[i].binary=i;
+            if(i==0)
             {
-                for(int j=0; j<10; j++)
+                Psum_R[i].count = 0;
+            }
+            else
+            {
+                Psum_R[i].count = Psum_R[i-1].count + Hist_array_R[i-1].count;
+            }
+        }
+        printf("\nPSUM R\n");
+        for (int i = 0; i <power ; i++)
+        {
+            printf("id %d: \t %d\n",Psum_R[i].binary,Psum_R[i].count);
+
+        }
+        //////////////////////////////////////////////////////////////////
+
+
+
+        tuple *final_array_R=malloc(sizeof(struct tuple)*10);
+        int where_R=0;
+        while(where_R < power)
+        {
+            if(where_R==power-1) ///////pepiptwsh pou eimaste sthn teleytaia epanalh4h
+            {
+                for(int i=Psum_R[where_R].count; i<10; i++)
                 {
-                    if( (array[j].payload & 0x3)==where)
+                    for(int j=0; j<10; j++)
                     {
-                        final_array[i].payload=array[j].payload;
-                        final_array[i].key=array[j].key;
-                        array[j].key=-1;
-                        array[j].payload=-1;
-                        break;
+                        if( (array_R[j].payload & mask)==where_R && (array_R[j].check==0))
+                        {
+                            final_array_R[i].key=array_R[j].key;
+                            final_array_R[i].payload=array_R[j].payload;
+                            array_R[j].check=1;
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+            else ///opoiadhpote endiamesh periptwsh
+            {
+
+                for(int i=Psum_R[where_R].count; i<Psum_R[where_R+1].count; i++)
+                {
+                    for(int j=0; j<10; j++)
+                    {
+                        if( (array_R[j].payload & mask)==where_R && (array_R[j].check==0))
+                        {
+                            final_array_R[i].key=array_R[j].key;
+                            final_array_R[i].payload=array_R[j].payload;
+                            array_R[j].check=1;
+                            break;
+                        }
                     }
                 }
             }
-            where++;
+
+            where_R++;
         }
+
+
+        printf("\nFINAL R\n");
         for(int i=0; i<10; i++)
         {
-            printf("id %d:\t%d\n",final_array[i].key,final_array[i].payload);
+            printf("id %d:\t%d\n",final_array_R[i].key,final_array_R[i].payload);
 
         }
+
+/////MEXRI EDW GIA TO R
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+        tuple *array_S=malloc(sizeof(struct tuple)*10);
+        for(int i=0; i<10; i++)
+        {
+            array_S[i].check=0;
+            array_S[i].key=i;
+            array_S[i].payload=rand()%10;
+        }
+
+        printf("\nARRAY S\n");
+        for(int i=0; i<10; i++)
+        {
+            printf("id %d:\t%d\n",array_S[i].key,array_S[i].payload);
+        }
+
+        ///////////////////////////////////////////////////////
+
+
+        ////////////////////////////////////////////////////////
+        ////////HIST
+        hist * Hist_array_S=malloc(sizeof(hist)* pow(2,n));
+
+        for(int i=0; i<power; i++)
+        {
+            Hist_array_S[i].binary=i;
+            Hist_array_S[i].count=0;
+        }
+
+        for(int i=0; i<10; i++)
+        {
+            for(int j=0; j<power; j++)
+            {
+                if( (array_S[i].payload & mask)==Hist_array_S[j].binary)
+                {
+                    Hist_array_S[j].count++;
+                    break;
+                }
+            }
+        }
+        printf("\nHIST S\n");
+        for(int i=0; i < power; i++)
+        {
+            printf("id %d: \t %d\n",Hist_array_S[i].binary,Hist_array_S[i].count);
+        }
+    /////////////////////////////////////////////////////////////////////
+
+
+        ////////////////////////////////////////////////////////////////////
+        //////////////PSUM
+        hist * Psum_S=malloc(sizeof(hist)*(power));
+        for(int i=0; i<power; i++)
+        {
+
+            Psum_S[i].binary=i;
+            if(i==0)
+            {
+                Psum_S[i].count = 0;
+            }
+            else
+            {
+                Psum_S[i].count = Psum_S[i-1].count + Hist_array_S[i-1].count;
+            }
+        }
+        printf("\nPSUM S\n");
+        for (int i = 0; i <power ; i++)
+        {
+            printf("id %d: \t %d\n",Psum_S[i].binary,Psum_S[i].count);
+
+        }
+        //////////////////////////////////////////////////////////////////
+
+
+
+        tuple *final_array_S=malloc(sizeof(struct tuple)*10);
+        int where_S=0;
+        while(where_S <= power)
+        {
+            if(where_S==power-1) ///////pepiptwsh pou eimaste sthn teleytaia epanalh4h
+            {
+                for(int i=Psum_S[where_S].count; i<10; i++)
+                {
+                    for(int j=0; j<10; j++)
+                    {
+                        if( (array_S[j].payload & mask)==where_S && (array_S[j].check==0))
+                        {
+                            final_array_S[i].key=array_S[j].key;
+                            final_array_S[i].payload=array_S[j].payload;
+                            array_S[j].check=1;
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+            else ///opoiadhpote endiamesh periptwsh
+            {
+
+                for(int i=Psum_S[where_S].count; i<Psum_S[where_S+1].count; i++)
+                {
+                    for(int j=0; j<10; j++)
+                    {
+                        if( (array_S[j].payload & mask)==where_S && (array_S[j].check==0))
+                        {
+                            final_array_S[i].key=array_S[j].key;
+                            final_array_S[i].payload=array_S[j].payload;
+                            array_S[j].check=1;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            where_S++;
+        }
+
+
+        printf("\nFINAL S\n");
+        for(int i=0; i<10; i++)
+        {
+            printf("id %d:\t%d\n",final_array_S[i].key,final_array_S[i].payload);
+
+        }
+
+
+
+////////MEXRI EDW R
+//////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////
+
+    //////////exoune dhmiourghyhei oi pinakes R' kai S' ws final_array_R kai final_array_S
+    ////////// kai apo dw kai katw ftiaxnoyme ta eurethria typou hash(bucket-chain)
+
+    int all_buckets = pow(2,n);
+    int next_prime;
+    struct relation * table_index; // to table pou tha exei to hash table
+    struct relation * table;
+    int size_of_table_to_hash;
+    int size_of_other_table;
+    int startR , startS; // to shmeio apo to opoio tha ksekinhsw na koitaw to kathe ena bucket
+    int * chain ,  * bucket;
+
+    int i, hash_key ;
+    table_index = malloc(sizeof(struct relation));
+    table = malloc(sizeof(struct relation));
+
+    for ( i = 0 ; i < all_buckets; i++)
+    {
+        if(Hist_array_R[i].count == 0 || Hist_array_S[i].count == 0 )
+        {
+            continue;
+        }
+        if( Hist_array_R[i].count < Hist_array_S[i].count )
+        {
+                size_of_table_to_hash = Hist_array_R[i].count ;
+                size_of_other_table = Hist_array_S[i].count;
+                table_index[i].tuples = malloc(size_of_table_to_hash* sizeof(struct tuple));
+                table[i].tuples = malloc(size_of_other_table* sizeof(struct tuple));
+
+            //edw prepei na mpei kai elegxow me to psum , gia na kserw apo pou tha ksekinhsw na tsekarw sto bucket.
+                    startR = Psum_R[i].count;
+                    startS = Psum_S[i].count;
+                    for(i =0 ; i < size_of_table_to_hash ; i ++)
+                    {
+                        table_index->tuples[i].key = final_array_R[i].key;
+                        table_index->tuples[i].payload = final_array_R[i].payload;
+
+                    }
+                    for(i = 0 ; i < size_of_other_table; i++)
+                    {
+                        table->tuples[i].key = final_array_S[i].key;
+                        table->tuples[i].payload = final_array_S[i].payload;
+                    }
+        }
+        else
+        {
+            size_of_table_to_hash = Hist_array_S[i].count;
+            size_of_other_table = Hist_array_R[i].count;
+            table_index[i].tuples = malloc(size_of_table_to_hash* sizeof(struct tuple));
+            table[i].tuples = malloc(size_of_other_table* sizeof(struct tuple));
+            //to idio me to apo panw
+                    startS = Psum_S[i].count;
+                    startR = Psum_R[i].count;
+            for(i =0 ; i < size_of_table_to_hash ; i ++)
+            {
+                table_index->tuples[i].key = final_array_S[i].key;
+                table_index->tuples[i].payload = final_array_S[i].payload;
+
+            }
+            for(i = 0 ; i < size_of_other_table; i++)
+            {
+                table->tuples[i].key = final_array_R[i].key;
+                table->tuples[i].payload = final_array_R[i].payload;
+            }
+
+        }
+
+        table_index->num_tuples = size_of_table_to_hash;
+        table->num_tuples = size_of_other_table;
+
+        hash_key = Number_used_for_hashing(size_of_table_to_hash);
+        bucket = malloc(sizeof (int) * hash_key);
+        chain = malloc(size_of_table_to_hash * sizeof(int));
+
+        for( i = 0; i < size_of_table_to_hash; i++)
+        {
+            chain[i] = -1;
+        }
+
+        for( i = 0; i < hash_key; i++)
+        {
+            bucket[i] = -1;
+        }
+
+        H2(table_index , chain , bucket , hash_key);
+
+        int k;
+        int check_id;
+        int x,y;
+        int to_insert_key1 , to_insert_key2;
+        for(i = 0 ; i < size_of_other_table; i++)
+        {
+            k = (table->tuples[i].payload % hash_key);
+            check_id = bucket[k];
+
+            while(check_id != -1)
+            {
+                x = array_R[check_id].payload;
+                y = table->tuples[startS + i].payload;
+
+                if( x == y )
+                {
+                    to_insert_key1 = table_index->tuples[startR + check_id].key;
+                    to_insert_key2 = table->tuples[startS + check_id].key;
+                    //kaleitai h sunarthsh me tis listes
+                            printf(" \n to x %d , to y %d \n" ,x,y );
+                            printf(" \n %d -> %d \n" , to_insert_key1, to_insert_key2);
+                }
+
+                check_id = chain[check_id];
+            }
+        }
+
+
+
     }
+
+
+
+}
 
