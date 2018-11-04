@@ -2,11 +2,88 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+<<<<<<< HEAD
 #include "structs.h"
 #include "functions.h"
 
 #define n 2
 
+=======
+
+#define n 2
+
+    typedef struct tuple
+    {
+        unsigned key;
+        unsigned payload;
+        int check;
+    }tuple;
+
+    typedef struct hist
+    {
+        unsigned binary;
+        unsigned count;
+    }hist;
+
+
+
+
+struct relation {
+    struct tuple *tuples;
+    int num_tuples;
+};
+
+
+int Number_used_for_hashing(int num)
+{
+    int flag , i , j;
+
+    for( i = num+1; i; i++)
+    {
+
+        flag=0;
+
+        for(j = 2; j < i; ++j)
+        {
+            if(i % j == 0)
+            {
+                flag=1;
+                break;
+            }
+        }
+
+        if(flag == 0)
+        {
+            printf("next prime is:%d",i);
+            return  i;
+        }
+    }
+}
+
+void H2 ( struct relation *table_index , int * bucket , int * chain, int M )
+{
+    int i , k ;
+    for (i = 0; i <table_index->num_tuples; i++)
+    {
+        k = (table_index->tuples[i].payload % M);
+        if (bucket[k] == -1)
+        {
+            bucket[k] = table_index->tuples[i].key;
+            chain[table_index->tuples[i].key] = 0;
+            //printf("grafw to %d sto %d me payload %d \n \n " , PinakasR[i].key, k, PinakasR[i].payload);
+        }
+        else
+        {
+            chain[table_index->tuples[i].key] = bucket[k];
+            bucket[k] = table_index->tuples[i].payload;
+            // printf("grafw sto %d \n",PinakasR[i].key);
+            // printf ( " eixa to %d kai twra exw to %d \n" , chainR[PinakasR[i].key] ,BucketR[k]);
+            //printf( " me payloads ta %d \n" , PinakasR[PinakasR[i].key].payload);
+        }
+    }
+}
+
+>>>>>>> 24e7f90448cdcf58dc507ea71818bf1e9c6dfbb1
 
 int main(int argc,char **argv)
     {
@@ -140,8 +217,12 @@ int main(int argc,char **argv)
             printf("id %d:\t%d\n",final_array_R[i].key,final_array_R[i].payload);
 
         }
+<<<<<<< HEAD
 
 /////MEXRI EDW GIA TO R
+=======
+        /////MEXRI EDW GIA TO R
+>>>>>>> 24e7f90448cdcf58dc507ea71818bf1e9c6dfbb1
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -223,7 +304,11 @@ int main(int argc,char **argv)
         int where_S=0;
         while(where_S <= power)
         {
+<<<<<<< HEAD
             if(where_S==power-1) ///////pepiptwsh pou eimaste sthn teleytaia epanalh4h
+=======
+            if(where_S==power-1) ///////pepiptwsh pou eimaste sthn teleytaia epanalh4h me plhres PSUM
+>>>>>>> 24e7f90448cdcf58dc507ea71818bf1e9c6dfbb1
             {
                 for(int i=Psum_S[where_S].count; i<10; i++)
                 {
@@ -270,6 +355,7 @@ int main(int argc,char **argv)
         }
 
 
+<<<<<<< HEAD
 
 ////////MEXRI EDW R
 //////////////////////////////////////////////////////////////
@@ -277,6 +363,10 @@ int main(int argc,char **argv)
 
     //////////exoune dhmiourghyhei oi pinakes R' kai S' ws final_array_R kai final_array_S
     ////////// kai apo dw kai katw ftiaxnoyme ta eurethria typou hash(bucket-chain)
+=======
+    /////apo toon basilh erxontai ayta
+    /////////////////////////////////////
+>>>>>>> 24e7f90448cdcf58dc507ea71818bf1e9c6dfbb1
 
     int all_buckets = pow(2,n);
     int next_prime;
