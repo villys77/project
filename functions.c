@@ -40,7 +40,6 @@ void insertResults(int Rid, int Sid, result* rhj)
 
     if(current->c<size)
     {
-       // printf("mphka\n");
         current->buffer[current->c][0] = Rid;
         current->buffer[current->c][1] = Sid;
         current->c++;
@@ -54,19 +53,21 @@ void insertResults(int Rid, int Sid, result* rhj)
     return;
 }
 
-void printResults(result* rhj)
+void printResults(result* rhj,int num_of_matches)
 {
-    while(rhj != NULL)
+    while(rhj!= NULL)
     {
         for(int i=0; i<size; i++)
         {
-            if(i==10)
+            if(i==num_of_matches)
             {
-                break;
+                return;
             }
             printf("|%d  |  %d|\n", rhj->buffer[i][0], rhj->buffer[i][1]);
         }
+        num_of_matches-=size;
         rhj = rhj->next;
+
     }
 }
 
@@ -90,7 +91,6 @@ int Number_used_for_hashing(int num)
 
         if(flag == 0)
         {
-            //printf("next prime is:%d",i);
             return  i;
         }
     }
