@@ -22,7 +22,7 @@ int main(int argc,char **argv)
         for(int i=0; i<10; i++)
         {
             array_R[i].check=0;
-            array_R[i].key=i;
+            array_R[i].key=i+1;
             array_R[i].payload=rand()%10;
         }
 
@@ -151,7 +151,7 @@ int main(int argc,char **argv)
         for(int i=0; i<10; i++)
         {
             array_S[i].check=0;
-            array_S[i].key=i;
+            array_S[i].key=i+1;
             array_S[i].payload=rand()%10;
         }
 
@@ -280,64 +280,217 @@ int main(int argc,char **argv)
 
     int all_buckets = pow(2,n);
     int next_prime;
-    struct relation * table_index; // to table pou tha exei to hash table
-    struct relation * table;
+    struct relation* table_index; // to table pou tha exei to hash table
+    struct relation* table;
+    int smaller_hist, bigger_hist;
     int size_of_table_to_hash;
     int size_of_other_table;
-    int startR , startS; // to shmeio apo to opoio tha ksekinhsw na koitaw to kathe ena bucket
-    int * chain ,  * bucket;
+    int startSmaller , startBigger; // to shmeio apo to opoio tha ksekinhsw na koitaw to kathe ena bucket
+    int *chain ,  *bucket;
 
-    int i, hash_key ;
+
+    int i, hash_key ,j  ;
+
+
+
     table_index = malloc(sizeof(struct relation));
     table = malloc(sizeof(struct relation));
 
-    for ( i = 0 ; i < all_buckets; i++)
+    for ( i = 0; i<all_buckets; i++)
     {
-        if(Hist_array_R[i].count == 0 || Hist_array_S[i].count == 0 )
+
+        if(Hist_array_R[i].count == 0 || Hist_array_S[i].count == 0)
         {
             continue;
         }
-        if( Hist_array_R[i].count < Hist_array_S[i].count )
+        if( Hist_array_R[i].count < Hist_array_S[i].count)
         {
-                size_of_table_to_hash = Hist_array_R[i].count ;
-                size_of_other_table = Hist_array_S[i].count;
-                table_index[i].tuples = malloc(size_of_table_to_hash* sizeof(struct tuple));
-                table[i].tuples = malloc(size_of_other_table* sizeof(struct tuple));
+            smaller_hist = Hist_array_R[i].count;
+            bigger_hist = Hist_array_S[i].count;
+            startSmaller = Psum_R[i].count;
+            startBigger = Psum_S[i].count;
 
+            table_index->tuples = malloc(smaller_hist *sizeof(tuple));
+            table ->tuples = malloc ( bigger_hist *sizeof(tuple));
+
+            table_index->num_tuples =smaller_hist ;
+            table->num_tuples = bigger_hist;
+            int count;
+
+            for (count = 0; count < smaller_hist; count++)
+            {
+                table_index->tuples[count].key = final_array_R[startSmaller+count].key;
+                table_index->tuples[count].payload = final_array_R[startBigger+count].payload;
+            }
+            for(count = 0 ; count < bigger_hist; count++)
+            {
+                table->tuples[count].key = final_array_S[startBigger+count].key;
+                table->tuples[count].payload = final_array_S[startBigger+count].payload;
+            }
+        }
+        else
+        {
+            smaller_hist = Hist_array_S[i].count;
+            bigger_hist = Hist_array_R[i].count;
+
+            startBigger = Psum_R[i].count;
+            startSmaller = Psum_S[i].count;
+
+
+            table_index->tuples= malloc(smaller_hist *sizeof(struct tuple));
+            table ->tuples = malloc(bigger_hist *sizeof(struct tuple));
+
+            table_index->num_tuples = smaller_hist;
+            table->num_tuples = bigger_hist;
+
+            int count;
+
+            for (count = 0; count < smaller_hist; count++)
+            {
+                table_index->tuples[count].key = final_array_S[startSmaller+count].key;
+                table_index->tuples[count].payload = final_array_S[startSmaller+count].payload;
+            }
+            printf("table index  : \n" );
+            for(count =0; count < smaller_hist; count++)
+            {
+                printf("%d\n",table_index->tuples[count].payload);
+            }
+
+            for(count = 0 ; count < bigger_hist; count++)
+            {
+                table->tuples[count].key = final_array_R[startBigger+count].key;
+                table->tuples[count].payload = final_array_R[startBigger+count].payload;
+            }
+
+            printf("\n table : \n");
+            for(count =0; count < bigger_hist; count++)
+            {
+                printf("%d\n",table->tuples[count].payload);
+            }
+
+        }
+
+        size_of_table_to_hash = Number_used_for_hashing(smaller_hist);
+
+        chain = (int *)malloc((smaller_hist + 1) *sizeof(int));
+        bucket = (int *)malloc ( size_of_table_to_hash *sizeof(int));
+
+        //arxikopoihsh twn pinakwn bucket kai chain
+        int count;
+        for(count = 0; count<size_of_table_to_hash; count++)
+        {
+            bucket[i] = -1;
+        }
+        for(count = 0; count<smaller_hist + 1 ; count++)
+        {
+            chain[count] = -1;
+        }
+
+        //hasharw ola ta stoixeia tou pinaka pou tha parw gia na kanw to eurethrio
+
+        H2(table_index , bucket , chain , size_of_table_to_hash);
+
+        //twra exw ton pinaka twn bucket kai tou chain kai prepei na kanw tous elegxous
+        int check_id , x ,y , key1 , key2;
+
+        for ( j = 0; j<bigger_hist; j++)
+        {
+            hash_key = (table->tuples[j].payload % size_of_table_to_hash);
+
+            check_id = bucket[hash_key] + 1;
+
+            y = table->tuples[j].payload;
+            while(check_id!= -1 )
+            {
+                x = table_index->tuples[check_id].payload;
+                if(x == y)
+                {
+                    key1 = table_index->tuples[check_id].key;
+                    key2 = table->tuples[j].key;
+                    printf ("edw ektupwnw giati %d = %d \n" , x,y);
+                    printf("me id ");
+                    printf( " %d --- %d \n", key1,key2);
+                }
+                else
+                {
+                    printf("Edw den ektupwnw giati x = %d kai y = %d \n \n ", x, y);
+                }
+
+                check_id = chain[check_id + 1];
+            }
+
+        }
+    }
+   /* table_index = malloc(sizeof(struct relation));
+    table = malloc(sizeof(struct relation));
+
+    for ( j = 0 ; j < all_buckets; j++)
+    {
+        printf( " ---------%d \n " , j);
+        if(Hist_array_R[j].count == 0 || Hist_array_S[j].count == 0 )
+        {
+            continue;
+        }
+        if( Hist_array_R[j].count < Hist_array_S[j].count )
+        {
+                size_of_table_to_hash = Hist_array_R[j].count ;
+                size_of_other_table = Hist_array_S[j].count;
+
+                printf (" to megethos tou R %d kai tou S %d \n", size_of_table_to_hash, size_of_other_table);
+
+                table_index->tuples = malloc(size_of_table_to_hash* sizeof(struct tuple));
+                table->tuples = malloc(size_of_other_table* sizeof(struct tuple));
+
+                table_index->num_tuples = size_of_table_to_hash;
+                table ->num_tuples = size_of_other_table;
             //edw prepei na mpei kai elegxow me to psum , gia na kserw apo pou tha ksekinhsw na tsekarw sto bucket.
-                    startR = Psum_R[i].count;
-                    startS = Psum_S[i].count;
+                    startR = Psum_R[j].count;
+                    startS = Psum_S[j].count;
+
+                    printf(" exw sR kai sS %d %d  \n " , startR , startS);
+
                     for(i =0 ; i < size_of_table_to_hash ; i ++)
                     {
-                        table_index->tuples[i].key = final_array_R[i].key;
-                        table_index->tuples[i].payload = final_array_R[i].payload;
+                        table_index->tuples[i].key = final_array_R[startR+i].key;
+                        table_index->tuples[i].payload = final_array_R[startR+i].payload;
 
                     }
                     for(i = 0 ; i < size_of_other_table; i++)
                     {
-                        table->tuples[i].key = final_array_S[i].key;
-                        table->tuples[i].payload = final_array_S[i].payload;
+                        table->tuples[i].key = final_array_S[startS+i].key;
+                        table->tuples[i].payload = final_array_S[startS+i].payload;
                     }
         }
         else
         {
-            size_of_table_to_hash = Hist_array_S[i].count;
-            size_of_other_table = Hist_array_R[i].count;
-            table_index[i].tuples = malloc(size_of_table_to_hash* sizeof(struct tuple));
-            table[i].tuples = malloc(size_of_other_table* sizeof(struct tuple));
+            size_of_table_to_hash = Hist_array_S[j].count;
+            size_of_other_table = Hist_array_R[j].count;
+
+            printf (" to megethos tou S %d kai tou R %d \n", size_of_table_to_hash, size_of_other_table);
+
+
+            table_index->tuples = malloc(size_of_table_to_hash*sizeof(struct tuple));
+            table->tuples = malloc(size_of_other_table*sizeof(struct tuple));
+
+            table_index->num_tuples = size_of_table_to_hash;
+            table ->num_tuples = size_of_other_table;
+
             //to idio me to apo panw
-                    startS = Psum_S[i].count;
-                    startR = Psum_R[i].count;
+                    startS = Psum_S[j].count;
+                    startR = Psum_R[j].count;
+
+            printf(" exw sR kai sS %d %d  \n " , startR , startS);
+
             for(i =0 ; i < size_of_table_to_hash ; i ++)
             {
-                table_index->tuples[i].key = final_array_S[i].key;
-                table_index->tuples[i].payload = final_array_S[i].payload;
+                table_index->tuples[i].key = final_array_S[startS+i].key;
+                table_index->tuples[i].payload = final_array_S[startS+i].payload;
 
             }
             for(i = 0 ; i < size_of_other_table; i++)
             {
-                table->tuples[i].key = final_array_R[i].key;
-                table->tuples[i].payload = final_array_R[i].payload;
+                table->tuples[i].key = final_array_R[startR+i].key;
+                table->tuples[i].payload = final_array_R[startR+i].payload;
             }
 
         }
@@ -361,36 +514,37 @@ int main(int argc,char **argv)
 
         H2(table_index , chain , bucket , hash_key);
 
+        for(i = 0 ; i < size_of_table_to_hash ; i++)
+        {
+            printf(" %d \n " , chain[i]);
+        }
+
         int k;
         int check_id;
         int x,y;
         int to_insert_key1 , to_insert_key2;
         for(i = 0 ; i < size_of_other_table; i++)
         {
-            k = (table->tuples[i].payload % hash_key);
+            k = (table->tuples[startS+i].payload % hash_key);
             check_id = bucket[k];
+            x = table_index->tuples[i].payload;
 
-            while(check_id != -1)
+            while(check_id != 0)
             {
-                x = array_R[check_id].payload;
-                y = table->tuples[startS + i].payload;
+                y = table->tuples[startS+i].payload;
 
                 if( x == y )
                 {
-                    to_insert_key1 = table_index->tuples[startR + check_id].key;
-                    to_insert_key2 = table->tuples[startS + check_id].key;
+                    to_insert_key1 = table_index->tuples[i].key;
+                    to_insert_key2 = table->tuples[startS+i].key;
                     //kaleitai h sunarthsh me tis listes
                             printf(" \n to x %d , to y %d \n" ,x,y );
                             printf(" \n %d -> %d \n" , to_insert_key1, to_insert_key2);
                 }
-
                 check_id = chain[check_id];
             }
         }
-
-
-
-    }
+    }*/
 
 
 
