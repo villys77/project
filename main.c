@@ -397,7 +397,7 @@ int main(int argc,char **argv)
         {
             hash_key = (table->tuples[j].payload % size_of_table_to_hash);
 
-            check_id = bucket[hash_key] + 1;
+            check_id = bucket[hash_key] +1 ;
 
             y = table->tuples[j].payload;
             while(check_id!= -1 )
