@@ -40,6 +40,7 @@ void insertResults(int Rid, int Sid, result* rhj)
 
     if(current->c<size)
     {
+       // printf("mphka\n");
         current->buffer[current->c][0] = Rid;
         current->buffer[current->c][1] = Sid;
         current->c++;
@@ -55,10 +56,14 @@ void insertResults(int Rid, int Sid, result* rhj)
 
 void printResults(result* rhj)
 {
-    while(rhj->next != NULL)
+    while(rhj != NULL)
     {
         for(int i=0; i<size; i++)
         {
+            if(i==10)
+            {
+                break;
+            }
             printf("|%d  |  %d|\n", rhj->buffer[i][0], rhj->buffer[i][1]);
         }
         rhj = rhj->next;
@@ -85,32 +90,21 @@ int Number_used_for_hashing(int num)
 
         if(flag == 0)
         {
-            printf("next prime is:%d",i);
+            //printf("next prime is:%d",i);
             return  i;
         }
     }
 }
 
-void H2 ( struct relation *table_index , int * bucket , int * chain, int M )
+//Hashing method
+int  H2 (int a)
 {
-    int i , k ;
-    for (i = 0; i <table_index->num_tuples; i++)
-    {
-        k = (table_index->tuples[i].payload % M);
-        if (bucket[k] == -1)
-        {
-            bucket[k] = table_index->tuples[i].key;
-            chain[table_index->tuples[i].key] = 0;
-            //printf("grafw to %d sto %d me payload %d \n \n " , PinakasR[i].key, k, PinakasR[i].payload);
-        }
-        else
-        {
-            chain[table_index->tuples[i].key] = bucket[k];
-            bucket[k] = table_index->tuples[i].payload;
-            // printf("grafw sto %d \n",PinakasR[i].key);
-            // printf ( " eixa to %d kai twra exw to %d \n" , chainR[PinakasR[i].key] ,BucketR[k]);
-            //printf( " me payloads ta %d \n" , PinakasR[PinakasR[i].key].payload);
-        }
-    }
+    a = (a ^ 61) ^ (a >> 16);
+    a = a + (a << 3);
+    a = a ^ (a >> 4);
+    a = a * 0x27d4eb2d;
+    a = a ^ (a >> 15);
+    return a;
 }
+
 

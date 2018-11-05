@@ -11,7 +11,7 @@ result* createResult();
 void insertResults(int, int , result*);
 void printResults(result* );
 int Number_used_for_hashing(int);
-void H2 ( struct relation * , int * , int *, int  );
+int H2 (int );
 
 
 #endif //PROJECT_FUNCTIONS_H
