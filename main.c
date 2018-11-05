@@ -1,6 +1,3 @@
-
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -30,7 +27,7 @@ int main(int argc,char **argv)
         }
 
         printf("\nARRAY R\n");
-        for(int i=0; i<100; i++)
+        for(int i=0; i<10; i++)
         {
             printf("id %d:\t%d\n",array_R[i].key,array_R[i].payload);
         }
@@ -158,8 +155,9 @@ int main(int argc,char **argv)
             array_S[i].payload=rand()%1000;
         }
 
+
         printf("\nARRAY S\n");
-        for(int i=0; i<100; i++)
+        for(int i=0; i<10; i++)
         {
             printf("id %d:\t%d\n",array_S[i].key,array_S[i].payload);
         }
@@ -255,7 +253,6 @@ int main(int argc,char **argv)
                             final_array_S[i].key=array_S[j].key;
                             final_array_S[i].payload=array_S[j].payload;
                             array_S[j].check=1;
-
                             break;
                         }
                     }
@@ -273,7 +270,7 @@ int main(int argc,char **argv)
 
         }
 
-
+    return 0;
 
 ////////MEXRI EDW R
 //////////////////////////////////////////////////////////////
