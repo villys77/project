@@ -38,6 +38,7 @@ int main(int argc,char **argv)
     rewind(file);
 
     int i=0;
+    int j;
     while (!feof(file))
     {
         if ((my_read = getline(&line, &len, file)) != -1)
@@ -53,7 +54,7 @@ int main(int argc,char **argv)
             my_data[i].array[0]+=4;
 
 
-            for(int j=1; j<my_data[i].num_columns; j++)
+            for(j=1; j<my_data[i].num_columns; j++)
             {
                 my_data[i].array[j]=my_data[i].array[0] + ((my_data[i].num_tuples*2)*j);
             }
@@ -74,21 +75,22 @@ int main(int argc,char **argv)
 */
 
     int where=0;
-    for(int i=0; i<size_of_file; i++)
+    int z;
+    for(i=0; i<size_of_file; i++)
     {
         where=0;
         my_data[i].relations=malloc(sizeof(struct relation)*my_data[i].num_columns);
-        for(int j=0; j<my_data[i].num_columns; j++)
+        for(j=0; j<my_data[i].num_columns; j++)
         {
             my_data[i].relations[j].tuples = malloc(sizeof(struct tuple)*my_data[i].num_tuples);
 
         }
 
-        for(int j=0; j<my_data[i].num_columns; j++)
+        for(j=0; j<my_data[i].num_columns; j++)
         {
             where=0;
 
-            for(int z=0; z<my_data[i].num_tuples; z++)
+            for(z=0; z<my_data[i].num_tuples; z++)
             {
 
                     my_data[i].relations[j].tuples[z].key=z;
@@ -102,7 +104,7 @@ int main(int argc,char **argv)
 
     }
 
-    for(int i=0; i<size_of_file; i++)
+    /*for(int i=0; i<size_of_file; i++)
     {
         for(int j=0; j< my_data[i].num_columns; j++)
         {
@@ -112,7 +114,7 @@ int main(int argc,char **argv)
                 //printf("%d %d\n",my_data[i].relations[j].tuples[z].key,my_data[i].relations[j].tuples[z].payload);
             }
         }
-    }
+    }*/
 
 
 
@@ -122,7 +124,7 @@ int main(int argc,char **argv)
    // result * rhj=radish_hash_join(my_data[0].relations[0],my_data[0].num_tuples,my_data[0].relations[1],my_data[0].num_tuples);
     //printResults(rhj,num_of_matches);
 
-    for(int i=0; i<size_of_file; i++)
+    for(i=0; i<size_of_file; i++)
     {
         free(my_data[i].array);
     }
