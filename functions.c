@@ -14,7 +14,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/types.h>
-
+//pameeeeeeeeee
 #define n 12
 
 
