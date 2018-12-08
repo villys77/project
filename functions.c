@@ -61,7 +61,7 @@ void insertResults(int Rid, int Sid, result* rhj)
     else
     {
         current = listAppend(current);
-        current->c=0;
+        current->c=1;
         insertResults(Rid, Sid, current);
     }
     return;
@@ -69,9 +69,10 @@ void insertResults(int Rid, int Sid, result* rhj)
 
 void printResults(result* rhj,int num_of_matches)
 {
+    int i;
     while(rhj!= NULL)
     {
-        for(int i=0; i<size; i++)
+        for(i=0; i<size; i++)
         {
             if(i==num_of_matches)
             {
@@ -139,14 +140,12 @@ int  H2 (int a)
 
 result * radish_hash_join(relation array_R,int R_size,relation array_S,int S_size)
 {
-
-
-
+    num_of_matches = 0;
     result *rhj=createResult();///dhmiourgia listas pou 8a xrhsimopoihsw argotera sto teleutaio stadio gia na krataw ta apotelesmata moy
 
     int power = pow(2, n); /// 2^n (megethos pinakwn psum kai hist)
     int mask = power - 1; //// maska gia &
-
+    int i,j;
     //////////////////////////////////////////////////
     /////////FIRST HASHING
 
@@ -159,15 +158,15 @@ result * radish_hash_join(relation array_R,int R_size,relation array_S,int S_siz
     ////////HIST
     hist Hist_array_R[power];
 
-    for (int i = 0; i < power; i++)
+    for (i = 0; i < power; i++)
     {
         Hist_array_R[i].binary = i;
         Hist_array_R[i].count = 0;
     }
 
-    for (int i = 0; i < R_size; i++)
+    for (i = 0; i < R_size; i++)
     {
-        for (int j = 0; j < power; j++)
+        for (j = 0; j < power; j++)
         {
             if ((array_R.tuples[i].payload & mask) == Hist_array_R[j].binary)
             {
@@ -184,7 +183,7 @@ result * radish_hash_join(relation array_R,int R_size,relation array_S,int S_siz
     ////////////////////////////////////////////////////////////////////
     //////////////PSUM
     hist Psum_R[power];
-    for (int i = 0; i < power; i++)
+    for (i = 0; i < power; i++)
     {
 
         Psum_R[i].binary = i;
@@ -209,9 +208,9 @@ result * radish_hash_join(relation array_R,int R_size,relation array_S,int S_siz
     {
         if (where_R == power - 1) ///////pepiptwsh pou eimaste sthn teleytaia epanalh4h
         {
-            for (int i = Psum_R[where_R].count; i < R_size; i++)
+            for (i = Psum_R[where_R].count; i < R_size; i++)
             {
-                for (int j = 0; j < R_size; j++)
+                for (j = 0; j < R_size; j++)
                 {
                     if ((array_R.tuples[j].payload & mask) == where_R && (array_R.tuples[j].check == 0))
                     {
@@ -227,9 +226,9 @@ result * radish_hash_join(relation array_R,int R_size,relation array_S,int S_siz
         else ///opoiadhpote endiamesh periptwsh
         {
 
-            for (int i = Psum_R[where_R].count; i < Psum_R[where_R + 1].count; i++)
+            for (i = Psum_R[where_R].count; i < Psum_R[where_R + 1].count; i++)
             {
-                for (int j = 0; j < R_size; j++)
+                for (j = 0; j < R_size; j++)
                 {
                     if ((array_R.tuples[j].payload & mask) == where_R && (array_R.tuples[j].check == 0))
                     {
@@ -260,15 +259,15 @@ result * radish_hash_join(relation array_R,int R_size,relation array_S,int S_siz
     ////////HIST
     hist Hist_array_S[power];
 
-    for (int i = 0; i < power; i++)
+    for (i = 0; i < power; i++)
     {
         Hist_array_S[i].binary = i;
         Hist_array_S[i].count = 0;
     }
 
-    for (int i = 0; i <S_size; i++)
+    for (i = 0; i <S_size; i++)
     {
-        for (int j = 0; j < power; j++)
+        for (j = 0; j < power; j++)
         {
             if ((array_S.tuples[i].payload & mask) == Hist_array_S[j].binary)
             {
@@ -285,7 +284,7 @@ result * radish_hash_join(relation array_R,int R_size,relation array_S,int S_siz
     ////////////////////////////////////////////////////////////////////
     //////////////PSUM
     hist Psum_S[power];
-    for (int i = 0; i < power; i++)
+    for (i = 0; i < power; i++)
     {
 
         Psum_S[i].binary = i;
@@ -309,9 +308,9 @@ result * radish_hash_join(relation array_R,int R_size,relation array_S,int S_siz
     {
         if (where_S == power - 1) ///////pepiptwsh pou eimaste sthn teleytaia epanalh4h
         {
-            for (int i = Psum_S[where_S].count; i < S_size; i++)
+            for (i = Psum_S[where_S].count; i < S_size; i++)
             {
-                for (int j = 0; j < S_size; j++)
+                for (j = 0; j < S_size; j++)
                 {
                     if ((array_S.tuples[j].payload & mask) == where_S && (array_S.tuples[j].check == 0))
                     {
@@ -327,9 +326,9 @@ result * radish_hash_join(relation array_R,int R_size,relation array_S,int S_siz
         else ///opoiadhpote endiamesh periptwsh
         {
 
-            for (int i = Psum_S[where_S].count; i < Psum_S[where_S + 1].count; i++)
+            for (i = Psum_S[where_S].count; i < Psum_S[where_S + 1].count; i++)
             {
-                for (int j = 0; j < S_size; j++)
+                for (j = 0; j < S_size; j++)
                 {
                     if ((array_S.tuples[j].payload & mask) == where_S && (array_S.tuples[j].check == 0))
                     {
@@ -351,7 +350,7 @@ result * radish_hash_join(relation array_R,int R_size,relation array_S,int S_siz
 //////////////////////////////////////////////////////////////
     //////////exoune dhmiourghyhei oi pinakes R' kai S' ws final_array_R kai final_array_S
     ////////// kai apo dw kai katw ftiaxnoyme ta eurethria typou hash(bucket-chain)
-    int i=0,j=0;
+   // int i=0,j=0;
     int next_prime;
     struct relation* table_index; // to table pou tha exei to hash table
     struct relation* table;
@@ -577,9 +576,10 @@ uint64_t * loadRelation(char* fileName)
 
 int min_value(tuple *array, int numrows)
 {
+    int c;
     int min = array[0].payload;
 
-    for (int c = 1; c < numrows; c++)
+    for (c = 1; c < numrows; c++)
     {
         if (array[c].payload < min)
         {
@@ -592,10 +592,11 @@ int min_value(tuple *array, int numrows)
 
 int max_value(tuple *array, int numrows)
 {
+    int c;
     int max = array[0].payload;
 
 
-    for (int c = 1; c < numrows; c++)
+    for (c = 1; c < numrows; c++)
     {
         if (array[c].payload > max)
         {
@@ -619,7 +620,7 @@ void queries_analysis(char * FileToOpen,struct  data * my_data)
 
     char ch;
     size_t len = 0;
-    ssize_t flag;
+    ssize_t check;
     char* line = NULL;
     int i,j;
     int space_num = 0;
@@ -627,7 +628,7 @@ void queries_analysis(char * FileToOpen,struct  data * my_data)
     int total_ques;
     int plus_num =0;
     char* temp_str = NULL;
-    while(flag = getline(&line , &len ,file ) != -1 )
+    while(check = getline(&line , &len ,file ) != -1 )
     {
 
         char* token;
@@ -669,14 +670,16 @@ void queries_analysis(char * FileToOpen,struct  data * my_data)
         data * mapping=malloc(sizeof(data)*relations_to_check);
         char * temp=strtok_r(sxeseis," ",&re);
         int id=atoi(temp);
-        printf("%d\n",id);
+        //printf("%s\n",re);
+        //printf("%d\n",id);
         mapping[0]=my_data[id];
         for(i=1; i<relations_to_check; i++)
         {
 
                 char * temp=strtok_r(re," ",&re);
+                //printf("%s\n",re);
                 int id=atoi(temp);
-                printf("%d\n",id);
+                //printf("%d\n",id);
                 mapping[i]=my_data[id];
 
         }
@@ -754,14 +757,15 @@ void queries_analysis(char * FileToOpen,struct  data * my_data)
                     }
                     if(flag1==1)
                     {
-                        printf("%d\n",mapping[ predicates[counter].relation1].num_tuples);
-                        printf("%d\n",mapping[ predicates[counter].relation2].num_tuples);
+                        //printf("%d\n",mapping[ predicates[counter].relation1].num_tuples);
+                        //printf("%d\n",mapping[ predicates[counter].relation2].num_tuples);
 
-                        result * rjh=radish_hash_join(mapping[ predicates[counter].relation1].relations[predicates[counter].colum1],
+                        /*result * rjh=radish_hash_join(mapping[ predicates[counter].relation1].relations[predicates[counter].colum1],
                                                       mapping[ predicates[counter].relation1].num_tuples,
                                                       mapping[ predicates[counter].relation2].relations[predicates[counter].colum2],
                                                       mapping[predicates[counter].relation2].num_tuples);
                         printResults(rjh,num_of_matches);
+                        free_list(rjh);*/
                     }
 
 
@@ -845,5 +849,4 @@ void queries_analysis(char * FileToOpen,struct  data * my_data)
         plus_num =0;
     }
 }
-
 
