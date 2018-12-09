@@ -670,18 +670,18 @@ void queries_analysis(char * FileToOpen,struct  data * my_data)
         data * mapping=malloc(sizeof(data)*relations_to_check);
         char * temp=strtok_r(sxeseis," ",&re);
         int id=atoi(temp);
+        int* rel = malloc(sizeof(int)*relations_to_check); //pinakas me ta ids twn relations
         //printf("%s\n",re);
         //printf("%d\n",id);
         mapping[0]=my_data[id];
         for(i=1; i<relations_to_check; i++)
         {
-
-                char * temp=strtok_r(re," ",&re);
-                //printf("%s\n",re);
-                int id=atoi(temp);
-                //printf("%d\n",id);
-                mapping[i]=my_data[id];
-
+          char * temp=strtok_r(re," ",&re);
+          //printf("%s\n",re);
+          int id=atoi(temp);
+          rel[i] = id;
+          //printf("%d\n",id);
+          mapping[i]=my_data[id];
         }
         free(sxeseis);
         //edw prepei na ftiaksoume enan pinaka me deiktes stous arxikous pinakes pou exoume wste na deixnoun oi relations_to_check
@@ -849,4 +849,3 @@ void queries_analysis(char * FileToOpen,struct  data * my_data)
         plus_num =0;
     }
 }
-
