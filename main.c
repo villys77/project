@@ -7,6 +7,7 @@
 #include "structs.h"
 #include "functions.h"
 
+
 int main(int argc,char **argv)
 {
     int i=0,j=0,z=0;
