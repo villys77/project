@@ -20,6 +20,10 @@ result * radish_hash_join(relation,int,relation,int);
 uint64_t *loadRelation(char*);
 int max_value(tuple *, int);
 int min_value(tuple *, int);
+endiamesiDomh* createEndiamesiDomh(int , int*);
+int ReltionInMid(endiamesiDomh*, int, int);
+relation* newRelation(endiamesiDomh*, int, int, relation*);
+void FilterUpdate(endiamesiDomh*, int, int, result*, int, int*);
 void queries_analysis(char*,struct data *);
 
 

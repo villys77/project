@@ -56,5 +56,10 @@ struct preds{
     char op; //einai h praksi ('<','>','=')
 };
 
+typedef struct endiamesiDomh
+{
+  int* relResults;
+  int** resArray;
+}endiamesiDomh;
 
 #endif //PROJECT_STRUCTS_H
