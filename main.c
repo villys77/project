@@ -59,17 +59,7 @@ int main(int argc,char **argv)
             i++;
         }
     }
-/*
-    for(int i=0; i<size_of_file; i++)
-    {
-        for(int j=0; j<my_data[i].num_columns; j++)
-        {
-            printf("%d ",*(my_data[i].array[j]));
 
-        }
-        printf("\n");
-    }
-*/
 
     int where=0;
     for(i=0; i<size_of_file; i++)
@@ -101,19 +91,7 @@ int main(int argc,char **argv)
 
     }
 
-    /*
-    for(int i=0; i<size_of_file; i++)
-    {
-        for(int j=0; j< my_data[i].num_columns; j++)
-        {
-            for(int z=0; z<my_data[i].num_tuples; z++)
-            {
 
-                printf("%d %d\n",my_data[i].relations[j].tuples[z].key,my_data[i].relations[j].tuples[z].payload);
-            }
-        }
-    }
-    */
     queries_analysis(argv[2],my_data);
 
 

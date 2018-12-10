@@ -54,6 +54,7 @@ struct preds{
     int colum2; // h kolona apo thn deuterh sxesh
     int num;
     char op; //einai h praksi ('<','>','=')
+    int prio;
 };
 
 typedef struct endiamesiDomh
@@ -61,5 +62,12 @@ typedef struct endiamesiDomh
   int* relResults;
   int** resArray;
 }endiamesiDomh;
+
+typedef struct result1
+{
+    int buffer[size];
+    struct result1* next;
+    int c;
+}result1;
 
 #endif //PROJECT_STRUCTS_H

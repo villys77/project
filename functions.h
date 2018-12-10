@@ -16,14 +16,15 @@ void printResults(result*,int );
 void free_list(result*);
 int Number_used_for_hashing(int);
 int H2 (int);
-result * radish_hash_join(relation,int,relation,int);
+result * radix_hash_join(relation,int,relation,int);
 uint64_t *loadRelation(char*);
 int max_value(tuple *, int);
 int min_value(tuple *, int);
 endiamesiDomh* createEndiamesiDomh(int , int*);
 int ReltionInMid(endiamesiDomh*, int, int);
 relation* newRelation(endiamesiDomh*, int, int, relation*);
-void FilterUpdate(endiamesiDomh*, int, int, result*, int, int*);
+endiamesiDomh * FilterUpdate(endiamesiDomh*, int, int, result1*, int, int*);
+int * select_pred(int, struct preds*);
 void queries_analysis(char*,struct data *);
 
 

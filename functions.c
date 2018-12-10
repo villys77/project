@@ -2,7 +2,6 @@
 // Created by villys on 5/11/2018.
 //
 
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -19,6 +18,7 @@
 #define n 12
 
 int num_of_matches;
+int num_of_matches1;
 
 result* listAppend(result* ptr)
 {
@@ -91,7 +91,136 @@ void printResults(result* rhj,int num_of_matches)
 
     }
 }
+////////////////////////////////////
+result1* listAppend1(result1* ptr)
+{
+    result1* newNode;
+    newNode = (result1*)malloc(sizeof(result1));
+    newNode->next = NULL;
 
+    while(ptr->next!=NULL)
+    {
+        ptr = ptr->next;
+    }
+
+    ptr->next = newNode;
+
+    return ptr->next;
+}
+
+result1* createResult1()
+{
+    result1* list;
+    list = malloc(sizeof(result1));
+    list->next=NULL;
+    list->c=0;
+    return list;
+}
+
+void insertResults1(int Rid,result1* list)
+{
+    result1* current = list;
+
+    while(current->next != NULL)
+    {
+        current = current->next;
+    }
+
+    if(current->c<size)
+    {
+        current->buffer[current->c]= Rid;
+        //current->buffer[current->c][1] = Sid+1;
+        current->c++;
+    }
+    else
+    {
+        current = listAppend1(current);
+        current->c=0;
+        insertResults1(Rid,current);
+    }
+    return;
+}
+void printResults1(result1* list,int num_of_matches1)
+{
+    int i=0;
+    while(list!= NULL)
+    {
+        for(i=0; i<size; i++)
+        {
+            if(i==num_of_matches1)
+            {
+                return;
+            }
+            printf("%d\n", list->buffer[i]);
+        }
+        if(num_of_matches1>=size)
+        {
+
+            num_of_matches1-=size;
+        }
+        list = list->next;
+
+    }
+}
+
+result1 * Equalizer(relation array,int b_size,int given_num,int given_mode)
+{
+    result1 * list=createResult1();
+    //pairnw ena array kai prepei na to diatreksw olo wste na brw tis times pou einai megaluteres 'h mikroteres 'h ises apo kapoion ari8mo
+    //orizw mode1 gia to = , mode 2 gia to > kai mode 3 gia to <
+    num_of_matches1=0;
+    int i;
+    if(given_mode == 1)
+    {
+        for(i = 0 ; i < b_size; i++)
+        {
+            if(array.tuples[i].payload == given_num)
+            {
+                num_of_matches1++;
+                insertResults1(array.tuples[i].key,list);
+            }
+        }
+    }
+    if(given_mode == 2)
+    {
+        for(i=0; i< b_size; i++)
+        {
+            if(array.tuples[i].payload > given_num)
+            {
+                num_of_matches1++;
+                insertResults1(array.tuples[i].key,list);
+            }
+        }
+    }
+    if ( given_mode ==3)
+    {
+        for(i =0; i< b_size; i++)
+        {
+            if(array.tuples[i].payload < given_num)
+            {
+                num_of_matches1++;
+                insertResults1(array.tuples[i].key,list);
+            }
+        }
+    }
+    return list;
+    //printResults(list,num_of_matches);
+}
+
+void free_list1(result1 *list)
+{
+    result1 * current_node=list;
+
+    while(current_node)
+    {
+        result1 * temp_next = current_node;
+        current_node = current_node->next;
+        free(temp_next);
+    }
+
+}
+
+////////////////////////////////////
 void free_list(result *rhj)
 {
     result * current_node=rhj;
@@ -140,7 +269,99 @@ int  H2 (int a)
     return a;
 }
 
-result * radish_hash_join(relation array_R,int R_size,relation array_S,int S_size)
+int * select_pred(int total_preds , struct preds *my_preds)
+{
+    int* prio_array = malloc(total_preds*(sizeof(int)));
+    int i,j,prio=0;
+    int here = 0;
+    for(i =0; i<total_preds; i++)
+    {
+        prio_array[i] = -1;
+    }
+
+    for(i =0; i<total_preds; i++)
+    {
+        if(my_preds[i].num != -1)
+        {
+            for(j=0; j<total_preds; j++)
+            {
+                if(i != j)
+                {
+                    //edw tsekarw an exw kapoia sugkrisi me ari9mo kai tsekarw an h sxesh epenalambanetai ths dinw proteraiothta
+                    if(my_preds[i].relation1 == my_preds[j].relation1 || my_preds[i].relation1 == my_preds[j].relation2
+                       || my_preds[i].relation2 == my_preds[j].relation1 || my_preds[i].relation2 == my_preds[j].relation2)
+                    {
+                        if(my_preds[i].prio == -1)
+                        {
+                            my_preds[i].prio = prio;
+                            prio ++;
+                            my_preds[j].prio = prio;
+                            prio++;
+                            continue;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if(prio == 0)//den exw oute mia praksi tupou >,< ,=
+    {
+        for(i =0; i< total_preds; i++)
+        {
+            for(j=0; j<total_preds; j++)
+            {
+                if(i != j)
+                {
+                    //edw tsekarw an exw kapoia sugkrisi me ari9mo kai tsekarw an h sxesh epenalambanetai ths dinw proteraiothta
+                    if(my_preds[i].relation1 == my_preds[j].relation1 || my_preds[i].relation1 == my_preds[j].relation2
+                       || my_preds[i].relation2 == my_preds[j].relation1 || my_preds[i].relation2 == my_preds[j].relation2)
+                    {
+                        if(my_preds[i].prio == -1)
+                        {
+                            my_preds[i].prio=prio;
+                            prio ++;
+                            my_preds[j].prio=prio;
+                            prio++;
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        if(my_preds[i].prio == -1)
+                        {
+                            my_preds[i].prio =prio;
+                            prio++;
+                            continue;
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+    for(i =0; i< total_preds; i++)
+    {
+        if(my_preds[i].prio == -1)
+        {
+            my_preds[i].prio = prio;
+            prio++;
+        }
+    }
+    for(i = 0; i< total_preds; i++)
+    {
+        for(j=0; j<total_preds; j++)
+        {
+            if(my_preds[j].prio == i)
+            {
+                prio_array[i]= j;
+            }
+        }
+    }
+    return prio_array;
+}
+
+result * radix_hash_join(relation array_R,int R_size,relation array_S,int S_size)
 {
     int i=0,j=0;
 
@@ -170,7 +391,7 @@ result * radish_hash_join(relation array_R,int R_size,relation array_S,int S_siz
 
     for (i = 0; i < R_size; i++)
     {
-        for (int j = 0; j < power; j++)
+        for (j = 0; j < power; j++)
         {
             if ((array_R.tuples[i].payload & mask) == Hist_array_R[j].binary)
             {
@@ -221,7 +442,7 @@ result * radish_hash_join(relation array_R,int R_size,relation array_S,int S_siz
         {
             for (i = Psum_R[where_R].count; i < R_size; i++)
             {
-                for (int j = 0; j < R_size; j++)
+                for (j = 0; j < R_size; j++)
                 {
                     if ((array_R.tuples[j].payload & mask) == where_R && (array_R.tuples[j].check == 0))
                     {
@@ -239,7 +460,7 @@ result * radish_hash_join(relation array_R,int R_size,relation array_S,int S_siz
 
             for (i = Psum_R[where_R].count; i < Psum_R[where_R + 1].count; i++)
             {
-                for (int j = 0; j < R_size; j++)
+                for (j = 0; j < R_size; j++)
                 {
                     if ((array_R.tuples[j].payload & mask) == where_R && (array_R.tuples[j].check == 0))
                     {
@@ -278,7 +499,7 @@ result * radish_hash_join(relation array_R,int R_size,relation array_S,int S_siz
 
     for (i = 0; i <S_size; i++)
     {
-        for (int j = 0; j < power; j++)
+        for (j = 0; j < power; j++)
         {
             if ((array_S.tuples[i].payload & mask) == Hist_array_S[j].binary)
             {
@@ -327,7 +548,7 @@ result * radish_hash_join(relation array_R,int R_size,relation array_S,int S_siz
         {
             for (i = Psum_S[where_S].count; i < S_size; i++)
             {
-                for (int j = 0; j < S_size; j++)
+                for (j = 0; j < S_size; j++)
                 {
                     if ((array_S.tuples[j].payload & mask) == where_S && (array_S.tuples[j].check == 0))
                     {
@@ -345,7 +566,7 @@ result * radish_hash_join(relation array_R,int R_size,relation array_S,int S_siz
 
             for (i = Psum_S[where_S].count; i < Psum_S[where_S + 1].count; i++)
             {
-                for (int j = 0; j < S_size; j++)
+                for (j = 0; j < S_size; j++)
                 {
                     if ((array_S.tuples[j].payload & mask) == where_S && (array_S.tuples[j].check == 0))
                     {
@@ -568,34 +789,16 @@ uint64_t * loadRelation(char* fileName)
 
     close(fp);
     return ptr;
-    /*
-     *
-     * for debugging
 
-    int numrows = ptr[0];
-    int numcol = ptr[1];
-
-    for (int i = 2; i < numrows+2; i++)
-    {
-        for(int j = 0; j < numcol; j++)
-        {
-            printf("%d | ", (int)ptr[j*numrows+i]);
-        }
-        printf("\n");
-    }
-
-    printf("num rows = %d\n", (int)ptr[0]);
-    printf("num columns = %d\n", (int)ptr[1]);
-
- */
 
 }
 
 int min_value(tuple *array, int numrows)
 {
+    int c;
     int min = array[0].payload;
 
-    for (int c = 1; c < numrows; c++)
+    for (c = 1; c < numrows; c++)
     {
         if (array[c].payload < min)
         {
@@ -610,140 +813,126 @@ int max_value(tuple *array, int numrows)
 {
     int max = array[0].payload;
 
-
-    for (int c = 1; c < numrows; c++)
+    int c;
+    for (c = 1; c < numrows; c++)
     {
         if (array[c].payload > max)
         {
-            printf("mphkaaaa]\n\n");
             max = (int)array[c].payload;
             int location = array[c].key;
         }
     }
     return max;
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//dhmiourgw endiamesh domh
+
 endiamesiDomh* createEndiamesiDomh(int numRel, int* rel)
 {
-  int i;
+    int i;
 
-  endiamesiDomh* mid = malloc(sizeof(endiamesiDomh));
-  mid->relResults = malloc(numRel*sizeof(int));  //pinakas me to se poia relations exw vrei matches
-  mid->resArray = (int**)malloc(numRel*sizeof(int*));  //pinakas me ta ids twn rels kai ta apotelesmata tous
+    endiamesiDomh* mid = malloc(sizeof(endiamesiDomh));
+    mid->relResults = malloc(numRel*sizeof(int));  //pinakas me to se poia relations exw vrei matches
+    mid->resArray = (int**)malloc(numRel*sizeof(int*));  //pinakas me ta ids twn rels kai ta apotelesmata tous
 
-  for(i=0; i<numRel; i++)
-  {
-    mid->relResults[i] = -1; //arxikopoiw me -1 ton pinaka me ta relations pou exoun apotelesmata
-    mid->resArray[i] = malloc(sizeof(int));
-    mid->resArray[i][0] = rel[i];
-  }
+    for(i=0; i<numRel; i++)
+    {
+        mid->relResults[i] = -1; //arxikopoiw me -1 ton pinaka me ta relations pou exoun apotelesmata
+        mid->resArray[i] = malloc(sizeof(int));
+        mid->resArray[i][0] = rel[i];
+    }
 
-  return mid;
+    return mid;
 }
 
-//elenxw an uparxei to rel_to_check sthn endiamesh
 int ReltionInMid(endiamesiDomh* mid, int rel_to_check, int numRel)
 {
-  int i;
-  for(i=0; i<numRel; i++)
-  {
-    if(mid->resArray[i][0]==rel_to_check && mid->relResults[i]!=-1)
+    int i;
+    for(i=0; i<numRel; i++)
     {
-      return 1;
+        if(mid->resArray[i][0]==rel_to_check && mid->relResults[i]!=-1)
+        {
+            return 1;
+        }
     }
-  }
-  return 0;
+    return 0;
 }
 
-//ftiaxnw neo relation me ta rowIds pou uparxon sthn endiamesh
 relation* newRelation(endiamesiDomh* mid, int numRel, int rel_id, relation* rel)
 {
-  int i, j;
+    int i, j;
 
-  relation* newRel = malloc(sizeof(relation));
+    relation* newRel = malloc(sizeof(relation));
 
-  newRel->num_tuples = mid->relResults[i]; //num_tuples = o arithmos twn apotelesmatwn tou relation sthn endiamesh domh
-
-  for(i=0; i<numRel; i++)
-  {
-    if(mid->resArray[i][0]==rel_id)
+    for(i=0; i<numRel; i++)
     {
-      //dasmeuw mnhmh
-      newRel->tuples = malloc(mid->relResults[i]*sizeof(tuple));
-      //pernaw ta rowIds kai ta values sto neo relation
-      for(j=1; i<newRel->num_tuples; i++)
-      {
-        newRel->tuples[i].key = mid->resArray[i][j];//vazw sto key to rowId apo thn andiamesh
-        newRel->tuples[i].payload = rel->tuples[mid->resArray[i][j]].payload; //sto value vazw auto pou antistoixei
-      }
-      break;
-    }
-  }
-  return newRel;
-}
-
-void FilterUpdate(endiamesiDomh* mid, int numRel, int rel_id, result* apotelesmata, int numOfResults, int* rel)
-{
-  int i, j;
-  for(i=0; i<numRel; i++)
-  {
-    if(mid->resArray[i][0]==rel_id)
-    {
-      //an den exw prohgoumena apotelesmata
-      if(mid->relResults[i] == -1)
-      {
-        mid->relResults[i] = numOfResults; //enmerwnw posa apotelesmata exei to relation me rel_id
-        //pernaw ta stoixeia 1-1 ston resArray[i][numofresults]
-
-        //desmeuw mnimi (thn prwth thesh thn exw hdh desmeusei kai krataei to rel_id)
-        mid->resArray[i] = realloc(mid->resArray[i], (numOfResults)*sizeof(int));
-        result* tmp = apotelesmata;
-        while(tmp!=NULL)
+        if(mid->resArray[i][0]==rel_id)
         {
-          int c=0;
-          for(j=0; j<size; j++)
-          {
-            mid->resArray[i][c] = tmp->buffer[j][0];
-            c++;
-          }
-          tmp = tmp->next;
-        }
-      }
-      else
-      {
-        //alliws ftiaxnw nea endiamesi
-        endiamesiDomh* new_mid;
-        new_mid = createEndiamesiDomh(numRel, rel);//arxikopoiw to new endiamesiDomh
-        for(i=0; i<numRel; i++)
-        {
-          if(mid->relResults[i]==-1)//desmeuw mnhmh gia to new_mid
-          {
-            //lathos
-            new_mid->resArray[i] = realloc(new_mid->resArray[i], numOfResults*sizeof(int));
-            result* tmp = apotelesmata;
-            while(tmp!=NULL)
+            newRel->num_tuples = mid->relResults[i]; //num_tuples = o arithmos twn apotelesmatwn tou relation sthn endiamesh domh
+            //dasmeuw mnhmh
+            newRel->tuples = malloc(mid->relResults[i]*sizeof(tuple));
+            //pernaw ta rowIds kai ta values sto neo relation
+            for(j=1; i<newRel->num_tuples; i++)
             {
-              int c=0;
-              for(j=0; j<size; j++)
-              {
-                new_mid->resArray[i][c] = tmp->buffer[j][0];
-                c++;
-              }
-              tmp = tmp->next;
+                newRel->tuples[i].key = mid->resArray[i][j];//vazw sto key to rowId apo thn andiamesh
+                newRel->tuples[i].payload = rel->tuples[mid->resArray[i][j]].payload; //sto value vazw auto pou antistoixei
             }
-            new_mid->relResults[i] = numOfResults;
-          }
+            break;
         }
-      }
     }
-  }
+    return newRel;
 }
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+endiamesiDomh *FilterUpdate(endiamesiDomh *mid, int numRel, int rel_id, result1 *apotelesmata, int numOfResults, int *rel)
+{
+    int i, j;
+    for (i = 0; i < numRel; i++) {
+        if (mid->resArray[i][0] == rel_id) {
+            //an den exw prohgoumena apotelesmata
+            if (mid->relResults[i] == -1) {
+                mid->relResults[i] = numOfResults; //enmerwnw posa apotelesmata exei to relation me rel_id
+                //pernaw ta stoixeia 1-1 ston resArray[i][numofresults]
+
+                //desmeuw mnimi thn prwth thesh thn exw hdh desmeusei kai krataei to rel_id)
+                mid->resArray[i] = realloc(mid->resArray[i], (numOfResults) * sizeof(int));
+                result1 *tmp = apotelesmata;
+                while (tmp != NULL) {
+                    int c = 1;
+                    for (j = 0; j < size; j++) {
+                        mid->resArray[i][c] = tmp->buffer[j];
+                        c++;
+                    }
+                    tmp = tmp->next;
+                }
+                return mid;
+            } else {
+                //alliws ftiaxnw nea endiamesi
+                endiamesiDomh *new_mid;
+                new_mid = createEndiamesiDomh(numRel, rel);//arxikopoiw to new endiamesiDomh
+                //gia kathe relation
+                for (i = 0; i < numRel; i++) {
+                    if (new_mid->relResults[i] == -1 && mid->relResults[i] != -1)//an exei prohgoumena apotelesmata
+                    {
+                        //desmeuw mnhmh gia to new_mid
+                        new_mid->resArray[i] = realloc(new_mid->resArray[i], numOfResults * sizeof(int));
+                        result1 *tmp = apotelesmata;
+                        while (tmp != NULL) {
+                            int c = 1;
+                            for (j = 0; j < size; j++) {
+                                //to stoixeio pou pernaw vrisketai sth thesh ths timhs pou mas dinei o buffer stin prohgoumeni ediamesh
+                                new_mid->resArray[i][c] = mid->resArray[i][tmp->buffer[j]];
+                                c++;
+                            }
+                            tmp = tmp->next;
+                        }
+                        new_mid->relResults[i] = numOfResults;
+                    }
+                }
+                return new_mid;
+            }
+        }
+    }
+}
+
 
 void queries_analysis(char * FileToOpen,struct  data * my_data)
 {
@@ -755,7 +944,7 @@ void queries_analysis(char * FileToOpen,struct  data * my_data)
         fprintf(stderr,"Error Opening file\n");
         exit(0);
     }
-
+    //int num_of_matches1 =0;
     char ch;
     size_t len = 0;
     ssize_t flag;
@@ -789,7 +978,7 @@ void queries_analysis(char * FileToOpen,struct  data * my_data)
         bzero(tokens[2],strlen(token)+1);
         strcpy(tokens[2],token);
 
-        printf("%s|%s|%s\n",tokens[0],tokens[1],tokens[2]);
+       ///debugging printf("%s|%s|%s\n",tokens[0],tokens[1],tokens[2]);
 
         //prepei na brw posa relation prepei na xrhsimopoihsw.
         for(i=0; i<strlen(tokens[0]); i++)
@@ -816,15 +1005,18 @@ void queries_analysis(char * FileToOpen,struct  data * my_data)
 
             char * temp=strtok_r(re," ",&re);
             int id=atoi(temp);
-            mapping[i]=my_data[id];
             rel[i]=id;
-            //printf("%d\n", id);
-        }
+            mapping[i]=my_data[id];
 
+        }
+        free(sxeseis);
         //edw prepei na ftiaksoume enan pinaka me deiktes stous arxikous pinakes pou exoume wste na deixnoun oi relations_to_check
         //deiktes sta colls pou prepei
 
         //blepw posa queries exw.
+
+        endiamesiDomh * end_domh=createEndiamesiDomh(relations_to_check,rel);
+
         for(i=0; i<strlen(tokens[1]); i++)
         {
             if(line[i+strlen(tokens[0])] =='&')
@@ -834,7 +1026,7 @@ void queries_analysis(char * FileToOpen,struct  data * my_data)
         }
         total_ques = plus_num + 1;
 
-        printf("Exw sunolika %d sxeseis kai %d queries\n\n",relations_to_check,total_ques);
+       ///debugging printf("Exw sunolika %d sxeseis kai %d queries\n\n",relations_to_check,total_ques);
         //edw prepei na dhmiourghsw enan pinaka total_ques megethous opou tha balw mesa ena ena ta erwthmata pou mou zhtaei
         struct preds *predicates = malloc(total_ques*sizeof(struct preds));
 
@@ -854,16 +1046,22 @@ void queries_analysis(char * FileToOpen,struct  data * my_data)
             if(temp_str[j] == '<' || temp_str[j] == '>' || temp_str[j]== '=')
             {
                 predicates[counter].op = temp_str[j];
-                // printf("%c\n",predicates[counter].op);
+                ///debugging printf("%c\n",predicates[counter].op);
                 counter ++;
                 erwthmata ++;
             }
         }
-
-        endiamesiDomh* middl;
-        middl = createEndiamesiDomh(relations_to_check, rel);
-        printf("Ftiaxnw endiamesh\n");
-
+        //Init values to -1
+        for(i =0; i<total_ques; i++)
+        {
+            predicates[i].relation1 =-1;
+            predicates[i].relation2 =-1;
+            predicates[i].num =-1;
+            predicates[i].colum1=-1;
+            predicates[i].colum2=-1;
+            predicates[i].prio = -1;
+        }
+        /////////////////////////
         counter =0;
         while (erwthmata > 0)
         {
@@ -880,7 +1078,7 @@ void queries_analysis(char * FileToOpen,struct  data * my_data)
                     token=strtok(NULL,"=");
                     predicates[counter].colum1 = atoi(token);
 
-                    printf("%d.%d %c ",predicates[counter].relation1,predicates[counter].colum1,predicates[counter].op);
+                   ///debugging printf("%d.%d %c ",predicates[counter].relation1,predicates[counter].colum1,predicates[counter].op);
 
                     token = strtok(NULL , "&");
 
@@ -893,71 +1091,15 @@ void queries_analysis(char * FileToOpen,struct  data * my_data)
                             token= strtok(NULL,"&");
                             predicates[counter].colum2 = atoi(token);
 
-                            printf("%d.%d \n",predicates[counter].relation2,predicates[counter].colum2);
+                            ///debugging printf("%d.%d \n",predicates[counter].relation2,predicates[counter].colum2);
                             flag1 = 1;
                         }
                     }
-                    if(flag1==1)
-                    {
-                        relation relation1,relation2;
-                        relation1.num_tuples=mapping[predicates[counter].relation1].num_tuples;
-                        relation2.num_tuples=mapping[predicates[counter].relation2].num_tuples;
-                        printf("num1 %d num2 %d\n",relation1.num_tuples,relation2.num_tuples);
-                        relation1.tuples=malloc(sizeof(tuple)*relation1.num_tuples);
-                        relation2.tuples=malloc(sizeof(tuple)*relation2.num_tuples);
-                        for(i=0; i<relation1.num_tuples; i++)
-                        {
-                            relation1.tuples[i].check=0;
-                        }
-                        for(i=0; i<relation2.num_tuples; i++)
-                        {
-                            relation2.tuples[i].check=0;
-                        }
-
-                        for(i=0; i<relation1.num_tuples; i++)
-                        {
-                            relation1.tuples[i].key=mapping[predicates[counter].relation1].relations[predicates[counter].colum1].tuples[i].key;
-                            relation1.tuples[i].payload=mapping[predicates[counter].relation1].relations[predicates[counter].colum1].tuples[i].payload;
-
-                        }
-                        for(i=0; i<relation2.num_tuples; i++)
-                        {
-                            relation2.tuples[i].key=mapping[predicates[counter].relation2].relations[predicates[counter].colum2].tuples[i].key;
-                            relation2.tuples[i].payload=mapping[predicates[counter].relation2].relations[predicates[counter].colum2].tuples[i].payload;
-
-                        }
-
-                        /*
-                        //elegxw an ta relations uparoun sthn endiamesh gia na dwsw to swsto ralation gia join
-                        int exists1=0, exists2=0;
-                        if(ReltionInMid(middl, predicates[counter].relation1, relations_to_check))
-                        {
-                          printf("relation1 in mid\n");
-                          exists1 = 1;
-                          relation* newRel1 = newRalation(middl, relations_to_check, predicates[counter].relation1, relation1)
-                        }
-
-                        if(ReltionInMid(middl, predicates[counter].relation2, relations_to_check))
-                        {
-                          printf("relation2 in mid\n");
-                          exists2 = 1
-                          relation* newRel2 = newRalation(middl, relations_to_check, predicates[counter].relation2, relation2)
-                        }
-                        */
-
-                        result * rhj=radish_hash_join(relation1,relation1.num_tuples,relation2,relation2.num_tuples);
-                        //printResults(rhj,num_of_matches);
-                        free(relation1.tuples);
-                        free(relation2.tuples);
-                        free_list(rhj);
-
-                    }
-
 
                     if(flag1 == 0)
                     {
                         predicates[counter].num = atoi(token);
-                        printf("%d\n",predicates[counter].num);
+                       ///debugging printf("%d\n",predicates[counter].num);
                     }
                     counter ++;
                 }
@@ -975,10 +1117,10 @@ void queries_analysis(char * FileToOpen,struct  data * my_data)
                     }
                     predicates[counter].colum1 = atoi(token);
 
-                    printf("%d.%d %c " ,predicates[counter].relation1 , predicates[counter].colum1, predicates[counter].op );
+                 ///debugging   printf("%d.%d %c " ,predicates[counter].relation1 , predicates[counter].colum1, predicates[counter].op );
                     token = strtok(NULL,"&");
                     predicates[counter].num = atoi(token);
-                    printf("%d\n", predicates[counter].num);
+                   ///debugging printf("%d\n", predicates[counter].num);
                     counter ++;
                 }
                 if(flag == 1)
@@ -991,7 +1133,7 @@ void queries_analysis(char * FileToOpen,struct  data * my_data)
                         predicates[counter].relation1  = atoi(token);
                         token = strtok(NULL,"&");
                         predicates[counter].colum1 = atoi(token);
-                        printf("%d %c %d.%d\n" , predicates[counter].num , predicates[counter].op, predicates[counter].relation1,predicates[counter].colum1);
+                       ///debugging printf("%d %c %d.%d\n" , predicates[counter].num , predicates[counter].op, predicates[counter].relation1,predicates[counter].colum1);
                         counter ++;
                         flag = 0;
                     }
@@ -1003,7 +1145,7 @@ void queries_analysis(char * FileToOpen,struct  data * my_data)
                         predicates[counter].relation1  = atoi(token);
                         token = strtok(NULL,"&");
                         predicates[counter].colum1 = atoi(token);
-                        printf("%d %c %d.%d\n" , predicates[counter].num , predicates[counter].op, predicates[counter].relation1,predicates[counter].colum1);
+                        ///debugging printf("%d %c %d.%d\n" , predicates[counter].num , predicates[counter].op, predicates[counter].relation1,predicates[counter].colum1);
                         counter ++;
                         flag = 0;
                     }
@@ -1015,7 +1157,7 @@ void queries_analysis(char * FileToOpen,struct  data * my_data)
                         predicates[counter].relation1  = atoi(token);
                         token = strtok(NULL,"&");
                         predicates[counter].colum1 = atoi(token);
-                        printf("%d %c %d.%d\n" , predicates[counter].num , predicates[counter].op, predicates[counter].relation1,predicates[counter].colum1);
+                        ///debugging printf("%d %c %d.%d\n" , predicates[counter].num , predicates[counter].op, predicates[counter].relation1,predicates[counter].colum1);
                         counter ++;
                         flag = 0;
                     }
@@ -1029,7 +1171,96 @@ void queries_analysis(char * FileToOpen,struct  data * my_data)
             erwthmata --;
             flag1 = 0;
         }
-        printf("\n");
+        int *prio;
+        prio  = select_pred(total_ques,predicates);
+        for(j= 0; j< total_ques; j++)
+        {
+            if(predicates[prio[j]].num == -1)//exw join.
+            {
+                relation relation1,relation2;
+                relation1.num_tuples=mapping[predicates[prio[j]].relation1].num_tuples;
+                relation2.num_tuples=mapping[predicates[prio[j]].relation2].num_tuples;
+               ///debugging printf("num1 %d num2 %d\n",relation1.num_tuples,relation2.num_tuples);
+                relation1.tuples=malloc(sizeof(tuple)*relation1.num_tuples);
+                relation2.tuples=malloc(sizeof(tuple)*relation2.num_tuples);
+                for(i=0; i<relation1.num_tuples; i++)
+                {
+                    relation1.tuples[i].check=0;
+                }
+                for(i=0; i<relation2.num_tuples; i++)
+                {
+                    relation2.tuples[i].check=0;
+                }
+
+                for(i=0; i<relation1.num_tuples; i++)
+                {
+                    relation1.tuples[i].key=mapping[predicates[prio[j]].relation1].relations[predicates[prio[j]].colum1].tuples[i].key;
+                    relation1.tuples[i].payload=mapping[predicates[prio[j]].relation1].relations[predicates[prio[j]].colum1].tuples[i].payload;
+
+                }
+                for(i=0; i<relation2.num_tuples; i++)
+                {
+                    relation2.tuples[i].key=mapping[predicates[prio[j]].relation2].relations[predicates[prio[j]].colum2].tuples[i].key;
+                    relation2.tuples[i].payload=mapping[predicates[prio[j]].relation2].relations[predicates[prio[j]].colum2].tuples[i].payload;
+
+                }
+
+                result * rhj=radix_hash_join(relation1,relation1.num_tuples,relation2,relation2.num_tuples);
+               // printResults(rhj,num_of_matches);
+                free(relation1.tuples);
+                free(relation2.tuples);
+                free_list(rhj);
+
+
+            }
+            else // exw sugkrish me enan ari8mo
+            {
+                int exists=0;
+
+                relation relation1;
+                relation1.num_tuples = mapping[predicates[prio[j]].relation1].num_tuples;
+                relation1.tuples = malloc(sizeof(tuple)*relation1.num_tuples);
+
+                for(i=0; i<relation1.num_tuples; i++)
+                {
+                    relation1.tuples[i].check =0;
+                }
+                for(i =0; i<relation1.num_tuples; i++)
+                {
+                    relation1.tuples[i].key=mapping[predicates[prio[j]].relation1].relations[predicates[prio[j]].colum1].tuples[i].key;
+                    relation1.tuples[i].payload=mapping[predicates[prio[j]].relation1].relations[predicates[prio[j]].colum1].tuples[i].payload;
+                }
+
+                //exists=ReltionInMid(end_domh,relations_to_check,predicates[prio[j]].relation1);
+
+                 //if exists endiamesh domh klp ...
+
+                if(predicates[prio[j]].op == '<')
+                {
+                    result1 * list = Equalizer(relation1,relation1.num_tuples,predicates[prio[j]].num,3);
+//                    printResults1(list,num_of_matches1);
+                    free_list1(list);
+                }
+                else if(predicates[prio[j]].op == '=')
+                {
+                    result1 * list = Equalizer(relation1,relation1.num_tuples,predicates[prio[j]].num,1);
+//                        printResults1(list,num_of_matches1);
+                    free_list1(list);
+                }
+                else if( predicates[prio[j]].op == '>')
+                {
+                    result1 * list = Equalizer(relation1,relation1.num_tuples,predicates[prio[j]].num,2);
+//                      printResults1(list,num_of_matches1);
+                    free_list1(list);
+                }
+                free(relation1.tuples);
+
+
+
+
+
+            }
+        }
 
         space_num = 0;
         plus_num =0;
@@ -1041,8 +1272,12 @@ void queries_analysis(char * FileToOpen,struct  data * my_data)
         free(tokens);
         free(predicates);
         free(mapping);
-       // free(line);
+        free(prio);
+        free(rel);
+        //free(end_domh);
 
     }
+    free(line);
     fclose(file);
+
 }
