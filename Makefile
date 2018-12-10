@@ -7,7 +7,6 @@ main.o : main.c
 functions.o : functions.c
 	gcc -I3 -g3 -c functions.c
 
-
 clean:
 	rm main ; rm *.o
 
