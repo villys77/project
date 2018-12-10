@@ -2,7 +2,6 @@
 // Created by villys on 5/11/2018.
 //
 
-
 #ifndef PROJECT_STRUCTS_H
 #define PROJECT_STRUCTS_H
 
